@@ -51,6 +51,7 @@ public class Processo extends Thread {
 				}
 				this.sistema.upMutex();
 
+				// Dorme se não houver nenhuma instância disponível
 				recurso.pegarInstancia();
 
 				this.sistema.downMutex();
@@ -58,27 +59,47 @@ public class Processo extends Thread {
 				System.out.println("Processo " + this.pid + " pegou o recurso " + recurso.nome);
 				this.sistema.upMutex();
 
-				this.temposCorrentes.add(this.tempoDeUtilizacao);
+				this.recursosAlocados.add(recurso);
+				this.temposCorrentes.add(this.tempoDeUtilizacao + 1);
 
 				contadorSolicitacao = this.tempoDeSolicitacao;
+
 			}
 
-			// Decrementando tempos e vendo se algum dos recursos deve ser liberado
-			for(int i = 0; i < this.temposCorrentes.size(); i++) {
-				int qtd = this.temposCorrentes.get(i) - 1;
-				if(qtd == 0) { // Deve liberar o recurso
-					Recurso recurso = this.recursosAlocados.get(i);
-					this.sistema.downMutex();
-					recurso.instancias++;
-					recurso.liberarInstancia();
-					this.sistema.upMutex();
-				} else {
-					this.temposCorrentes.set(i, qtd);
-				}
+			// Decrementando tempos
+			this.decrementaTempoDasInstancias();
+
+			// Liberando recursos
+			int index = -1;
+			while((index = this.indexDoPrimeiroRecursoALiberar()) >= 0) {
+				Recurso recurso = this.recursosAlocados.get(index);
+				this.sistema.downMutex();
+				recurso.instancias++;
+				recurso.liberarInstancia();
+				this.sistema.upMutex();
+				this.recursosAlocados.remove(index);
+				this.temposCorrentes.remove(index);
 			}
 
 		}
 
+		System.out.println("Processo " + this.pid + " finalizou");
+
+	}
+
+	private void decrementaTempoDasInstancias() {
+		for(int i = 0; i < this.temposCorrentes.size(); i++) {
+			this.temposCorrentes.set(i, this.temposCorrentes.get(i) - 1);
+		}
+	}
+
+	private int indexDoPrimeiroRecursoALiberar() {
+		for(int i = 0; i < this.temposCorrentes.size(); i++) {
+			if(this.temposCorrentes.get(i) == 0) {
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 }
