@@ -62,8 +62,8 @@ public class Sistema extends Thread {
 					if (recursoRequisitado == -1 || recursosDisponiveis.get(recursoRequisitado) != 0){
 						processosSemRodar.remove(Integer.valueOf(i));
 						reiniciarAnalise = true;
-						for (int i1 = 0; i1 < processos.get(i).numeroDeInstancias.length; i1++) {
-							recursosDisponiveis.set(i,recursosDisponiveis.get(i) + processos.get(i).numeroDeInstancias[i]);
+						for (int j = 0; j < processos.get(i).numeroDeInstancias.length; j++) {
+							recursosDisponiveis.set(j,recursosDisponiveis.get(j) + processos.get(i).numeroDeInstancias[j]);
 						}
 					}
 				}
