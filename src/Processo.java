@@ -16,9 +16,14 @@ public class Processo extends Thread {
 	private ArrayList<Recurso> recursosAlocados = new ArrayList<Recurso>();
 	public int[] numeroDeInstancias;
 
+	public ArrayList<Recurso> getRecursosAlocados() {
+		return recursosAlocados;
+	}
+
 	public Processo(int pid, int tempoDeSolicitacao, int tempoDeUtilizacao, Sistema sistema){
 		this.pid = pid;
 		this.tempoDeSolicitacao = tempoDeSolicitacao;
+
 		this.tempoDeUtilizacao = tempoDeUtilizacao;
 		this.sistema = sistema;
 		this.numeroDeInstancias = new int[sistema.recursos.size()];
@@ -43,7 +48,10 @@ public class Processo extends Thread {
 
 				// Pegando o índice de um recurso aleatório
 				this.sistema.downMutex();
-				this.requisicaoCorrente = this.sistema.getIndiceDeRecurso();
+				int indice = this.sistema.getIndiceDeRecurso(pid);
+				if(indice != -1) {
+					this.requisicaoCorrente = indice;
+				}
 				this.sistema.upMutex();
 
 				Recurso recurso = this.sistema.recursos.get(this.requisicaoCorrente);

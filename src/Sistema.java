@@ -72,9 +72,35 @@ public class Sistema extends Thread {
 	}
 
     // TODO Melhorar esse método
-    public int getIndiceDeRecurso() {
+    public int getIndiceDeRecurso(int processIndex) {
         Random random = new Random();
-        return random.nextInt(this.recursos.size());
+
+		int randomNum;
+		int aux;
+		int contador = 0;
+
+		do {
+			aux = 0;
+			randomNum = random.nextInt(this.recursos.size());
+
+			for (Processo processo : processos) {
+				if(processo.pid == processIndex){
+					for (Recurso recurso : processo.getRecursosAlocados()) {
+						if(recurso.nome == recursos.get(randomNum).nome){
+							aux++;
+						}
+					}
+				}
+			}
+
+			contador++;
+		}while(contador < 100 && aux < recursos.get(randomNum).maxInstancias);
+
+		if(contador == 100){
+			return -1;
+		}
+
+        return randomNum;
     }
 
     public void downMutex() {
