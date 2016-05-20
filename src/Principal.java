@@ -147,7 +147,7 @@ public class Principal extends JFrame {
 		lblQuantidade.setBounds(223, 166, 70, 14);
 		panel.add(lblQuantidade);
 
-		JButton btnCadastrar = new JButton("Configurar");
+		final JButton btnCadastrar = new JButton("Configurar");
 		btnCadastrar.setBounds(124, 191, 120, 23);
 		btnCadastrar.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){

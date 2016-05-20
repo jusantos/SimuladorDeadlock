@@ -20,7 +20,6 @@ public class Processo extends Thread {
 	}
 	
 	public void run(){
-
 		int contadorSolicitacao = this.tempoDeSolicitacao;
 
 		while(this.keepAlive) {
@@ -62,7 +61,6 @@ public class Processo extends Thread {
 				this.temposCorrentes.add(this.tempoDeUtilizacao);
 
 				contadorSolicitacao = this.tempoDeSolicitacao;
-
 			}
 
 			// Decrementando tempos e vendo se algum dos recursos deve ser liberado
