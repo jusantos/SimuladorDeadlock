@@ -44,20 +44,17 @@ public class Processo extends Thread {
 
 				// Pegando o índice de um recurso aleatório
 				this.sistema.downMutex();
-				this.requisicaoCorrente = this.sistema.getIndiceDeRecurso();
-				this.sistema.upMutex();
-
+				this.requisicaoCorrente = this.sistema.getIndiceDeRecurso(); // TODO Pegar um recurso aleatório de forma 'correta'
 				Recurso recurso = this.sistema.recursos.get(this.requisicaoCorrente);
+				this.sistema.upMutex();
 
 				// Pegando o recurso a partir do semáforo
 				principal.log("Processo " + this.pid + " solicitou o recurso " + recurso.nome);
 				principal.desenharTabelaDeRequisicoes();
 
-				this.sistema.downMutex();
 				if(recurso.instancias == 0) {
 					principal.log("Processo " + this.pid + " bloqueou pelo recurso " + recurso.nome);
 				}
-				this.sistema.upMutex();
 
 				// Dorme se não houver nenhuma instância disponível
 				recurso.pegarInstancia();
@@ -83,15 +80,15 @@ public class Processo extends Thread {
 			this.decrementaTempoDasInstancias();
 
 			// Liberando recursos
-			int index = -1;
-			while((index = this.indexDoPrimeiroRecursoALiberar()) >= 0) {
-				Recurso recurso = this.recursosAlocados.get(index);
+			if(this.temposCorrentes.get(0) == 0) {
+				Recurso recurso = this.recursosAlocados.get(0);
 				this.sistema.downMutex();
+//				this.numeroDeInstancias-- TODO Decrementar o número de instancias de um recurso para este processo
 				recurso.instancias++;
 				recurso.liberarInstancia();
 				this.sistema.upMutex();
-				this.recursosAlocados.remove(index);
-				this.temposCorrentes.remove(index);
+				this.recursosAlocados.remove(0);
+				this.temposCorrentes.remove(0);
 			}
 
 		}
@@ -104,15 +101,6 @@ public class Processo extends Thread {
 		for(int i = 0; i < this.temposCorrentes.size(); i++) {
 			this.temposCorrentes.set(i, this.temposCorrentes.get(i) - 1);
 		}
-	}
-
-	private int indexDoPrimeiroRecursoALiberar() {
-		for(int i = 0; i < this.temposCorrentes.size(); i++) {
-			if(this.temposCorrentes.get(i) == 0) {
-				return i;
-			}
-		}
-		return -1;
 	}
 	
 }
