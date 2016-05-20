@@ -95,6 +95,7 @@ public class Principal extends JFrame {
 		tfIdentificadorProcesso = new JTextField("0");
 		tfIdentificadorProcesso.setBounds(10, 101, 46, 20);
 		panel.add(tfIdentificadorProcesso);
+		tfIdentificadorProcesso.setEnabled(false);
 		tfIdentificadorProcesso.setColumns(10);
 
 		tfTempoSolicitacaoProcesso = new JTextField();
@@ -118,24 +119,6 @@ public class Principal extends JFrame {
 		JLabel lblTempoUtilizacao = new JLabel("TU");
 		lblTempoUtilizacao.setBounds(66, 166, 46, 14);
 		panel.add(lblTempoUtilizacao);
-
-		JButton btnEnviar = new JButton("Criar");
-		btnEnviar.setBounds(10, 191, 89, 23);
-		btnEnviar.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				try {
-					int pid = Integer.parseInt(lbIdentificador.getText());
-					int tempoSolicitacao = Integer.parseInt(tfTempoSolicitacaoProcesso.getText());
-					int tempoUtilizacao = Integer.parseInt(tfTempoUtilizacaoProcesso.getText());
-					Processo processo = new Processo(pid, tempoSolicitacao, tempoUtilizacao);
-					sistema.adicionarProcesso(processo);
-				} catch(Exception e1) {
-					JOptionPane.showMessageDialog(null, "Valor(es) inválido(s)!");
-				}
-			}
-		});
-		panel.add(btnEnviar);
-
 
 		tfNomeRecurso = new JTextField();
 		tfNomeRecurso.setBounds(127, 101, 86, 20);
@@ -173,12 +156,40 @@ public class Principal extends JFrame {
 					int instancias = Integer.parseInt(tftfinstanciasRecurso.getText().trim());
 					Recurso recurso = new Recurso(nome, instancias);
 					sistema.adicionarRecurso(recurso);
+					System.out.println("Novo recurso criado");
 				} catch(Exception e1) {
 					JOptionPane.showMessageDialog(null, "Valor(es) inválido(s)!");
 				}
 			}
 		});
 		panel.add(btnCadastrar);
+
+		JButton btnEnviar = new JButton("Criar");
+		btnEnviar.setBounds(10, 191, 89, 23);
+		btnEnviar.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				try {
+					
+					int pid = Integer.parseInt(tfIdentificadorProcesso.getText());
+					int tempoSolicitacao = Integer.parseInt(tfTempoSolicitacaoProcesso.getText());
+					int tempoUtilizacao = Integer.parseInt(tfTempoUtilizacaoProcesso.getText());
+					Processo processo = new Processo(pid, tempoSolicitacao, tempoUtilizacao);
+					sistema.adicionarProcesso(processo);
+					System.out.println("Novo processo criado");
+					tfIdentificadorProcesso.setText("" + (pid + 1));
+
+					// Desabilitando a criação de recursos
+					tfIdentificadorRecurso.setEnabled(false);
+					tfNomeRecurso.setEnabled(false);
+					tftfinstanciasRecurso.setEnabled(false);
+					btnCadastrar.setEnabled(false);
+
+				} catch(Exception e1) {
+					JOptionPane.showMessageDialog(null, "Valor(es) inválido(s)!");
+				}
+			}
+		});
+		panel.add(btnEnviar);
 
 		tfTempoVerificacao = new JTextField();
 		tfTempoVerificacao.setBounds(311, 105, 86, 20);
