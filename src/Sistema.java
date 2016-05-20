@@ -58,7 +58,8 @@ public class Sistema extends Thread {
 			reiniciarAnalise = false;
 			for (int i = 0; i < recursosRequisitados.size(); i++) {
 				if (processosSemRodar.contains(i)){
-					if (recursosDisponiveis.get(recursosRequisitados.get(i)) != 0){
+					int recursoRequisitado = recursosRequisitados.get(i);
+					if (recursoRequisitado == -1 || recursosDisponiveis.get(recursoRequisitado) != 0){
 						processosSemRodar.remove(Integer.valueOf(i));
 						reiniciarAnalise = true;
 						for (int i1 = 0; i1 < processos.get(i).numeroDeInstancias.length; i1++) {
