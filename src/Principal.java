@@ -40,7 +40,6 @@ public class Principal extends JFrame {
 	public static JTable tableRecurso;
 
 	public Sistema sistema = new Sistema(2);
-	public Semaphore mutex = new Semaphore(1);
 
 	/**
 	 * Launch the application.
@@ -92,18 +91,18 @@ public class Principal extends JFrame {
 		lblSistemaOperacional.setBounds(311, 80, 160, 14);
 		panel.add(lblSistemaOperacional);
 
-		tfIdentificadorProcesso = new JTextField("0");
+		tfIdentificadorProcesso = new JTextField("1");
 		tfIdentificadorProcesso.setBounds(10, 101, 46, 20);
 		panel.add(tfIdentificadorProcesso);
 		tfIdentificadorProcesso.setEnabled(false);
 		tfIdentificadorProcesso.setColumns(10);
 
-		tfTempoSolicitacaoProcesso = new JTextField();
+		tfTempoSolicitacaoProcesso = new JTextField("5");
 		tfTempoSolicitacaoProcesso.setBounds(10, 132, 46, 20);
 		panel.add(tfTempoSolicitacaoProcesso);
 		tfTempoSolicitacaoProcesso.setColumns(10);
 
-		tfTempoUtilizacaoProcesso = new JTextField();
+		tfTempoUtilizacaoProcesso = new JTextField("100");
 		tfTempoUtilizacaoProcesso.setBounds(10, 163, 46, 20);
 		panel.add(tfTempoUtilizacaoProcesso);
 		tfTempoUtilizacaoProcesso.setColumns(10);
@@ -120,17 +119,18 @@ public class Principal extends JFrame {
 		lblTempoUtilizacao.setBounds(66, 166, 46, 14);
 		panel.add(lblTempoUtilizacao);
 
-		tfNomeRecurso = new JTextField();
+		tfNomeRecurso = new JTextField("Impressora");
 		tfNomeRecurso.setBounds(127, 101, 86, 20);
 		panel.add(tfNomeRecurso);
 		tfNomeRecurso.setColumns(10);
 
-		tfIdentificadorRecurso = new JTextField("0");
+		tfIdentificadorRecurso = new JTextField("1");
 		tfIdentificadorRecurso.setBounds(127, 132, 86, 20);
 		panel.add(tfIdentificadorRecurso);
+		tfIdentificadorRecurso.setEnabled(false);
 		tfIdentificadorRecurso.setColumns(10);
 
-		tftfinstanciasRecurso = new JTextField();
+		tftfinstanciasRecurso = new JTextField("2");
 		tftfinstanciasRecurso.setBounds(127, 163, 86, 20);
 		panel.add(tftfinstanciasRecurso);
 		tftfinstanciasRecurso.setColumns(10);
@@ -155,8 +155,10 @@ public class Principal extends JFrame {
 					String nome = tfNomeRecurso.getText().trim();
 					int instancias = Integer.parseInt(tftfinstanciasRecurso.getText().trim());
 					Recurso recurso = new Recurso(nome, instancias);
+					sistema.downMutex();
 					sistema.adicionarRecurso(recurso);
-					System.out.println("Novo recurso criado");
+					sistema.upMutex();
+					System.out.println("Novo recurso criado: " + recurso.nome + ", com " + recurso.instancias + " instâncias");
 				} catch(Exception e1) {
 					JOptionPane.showMessageDialog(null, "Valor(es) inválido(s)!");
 				}
@@ -169,12 +171,18 @@ public class Principal extends JFrame {
 		btnEnviar.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				try {
-					
+
 					int pid = Integer.parseInt(tfIdentificadorProcesso.getText());
 					int tempoSolicitacao = Integer.parseInt(tfTempoSolicitacaoProcesso.getText());
 					int tempoUtilizacao = Integer.parseInt(tfTempoUtilizacaoProcesso.getText());
-					Processo processo = new Processo(pid, tempoSolicitacao, tempoUtilizacao);
+					Processo processo = new Processo(pid, tempoSolicitacao, tempoUtilizacao, sistema);
+
+					sistema.downMutex();
 					sistema.adicionarProcesso(processo);
+					sistema.upMutex();
+
+					processo.start();
+
 					System.out.println("Novo processo criado");
 					tfIdentificadorProcesso.setText("" + (pid + 1));
 

@@ -1,9 +1,12 @@
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.Semaphore;
 
 public class Sistema extends Thread {
 	
 	public ArrayList<Processo> processos = new ArrayList<Processo>();
 	public ArrayList<Recurso> recursos = new ArrayList<Recurso>();
+    public Semaphore mutex = new Semaphore(1);
 	
 	public int intervaloDeVerificacao;
 	public int tempo;
@@ -67,4 +70,22 @@ public class Sistema extends Thread {
 	public void setIntervaloDeVerificacao(int intervalo) {
 		this.intervaloDeVerificacao = intervalo;
 	}
+
+    // TODO Melhorar esse método
+    public int getIndiceDeRecurso() {
+        Random random = new Random();
+        return random.nextInt(this.recursos.size());
+    }
+
+    public void downMutex() {
+        try {
+            this.mutex.acquire();
+        } catch (InterruptedException e) {
+        }
+    }
+
+    public void upMutex() {
+        this.mutex.release();
+    }
+
 }
