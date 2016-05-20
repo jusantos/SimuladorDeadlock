@@ -70,7 +70,7 @@ public class Sistema extends Thread {
 			}
 		}while (reiniciarAnalise);
 
-		if (processosSemRodar.size() < processos.size()){
+		if (processosSemRodar.size() > 0){
 			System.out.println("DeadLock detectado entre os processos:");
 			for (Integer integer : processosSemRodar) {
 				System.out.println(processos.get(integer).pid + " ");
