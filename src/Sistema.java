@@ -25,20 +25,14 @@ public class Sistema extends Thread {
 		ActiveProcesso = true;
 		while(true){
 			try{
-				Thread.sleep(this.intervaloDeVerificacao * 1000);
+				Thread.sleep(1000);
 				System.out.println("Sistema verificando a cada " + this.intervaloDeVerificacao + " segundos");
-//				tempo++;
-//				if(getTempo() % intervaloDeVerificacao == 0){
-//					if(Processo.numeroDeProcessos == 1){
-//						Principal.STATUS.setText("SISTEMA NORMAL");
-//					}else if(Processo.numeroDeProcessos!=1 && Processo.recursoAtual == true){
-//						Principal.STATUS.setText("DEADLOCK");
-//					}else{
-//						Principal.STATUS.setText("SISTEMA NORMAL");
-//					}
-//				}
-					
-				
+				tempo++;
+				if(getTempo() % intervaloDeVerificacao == 0){
+					downMutex();
+					detectarDeadLock();
+					upMutex();
+				}
 			} catch (InterruptedException e){
 				e.printStackTrace();
 			}
