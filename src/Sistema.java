@@ -14,10 +14,12 @@ public class Sistema extends Thread {
 	public int tempo;
 	public static String status;
 	public static boolean ActiveProcesso = true;
-	
 
-	public Sistema(int intervalo){
+    public Principal principal;
+
+	public Sistema(int intervalo, Principal principal){
 		this.intervaloDeVerificacao = intervalo;
+        this.principal = principal;
 	}
 	
 	
@@ -26,12 +28,9 @@ public class Sistema extends Thread {
 		while(true){
 			try{
 				Thread.sleep(1000);
-				System.out.println("Sistema verificando a cada " + this.intervaloDeVerificacao + " segundos");
 				tempo++;
 				if(getTempo() % intervaloDeVerificacao == 0){
-					downMutex();
 					detectarDeadLock();
-					upMutex();
 				}
 			} catch (InterruptedException e){
 				e.printStackTrace();
@@ -40,6 +39,7 @@ public class Sistema extends Thread {
 	}
 
 	public void detectarDeadLock(){
+
 		ArrayList<Integer> recursosDisponiveis = new ArrayList<>(recursos.size());
 		ArrayList<Integer> recursosRequisitados = new ArrayList<>(processos.size());
 		ArrayList<Integer> processosSemRodar     = new ArrayList<>(processos.size());
@@ -71,11 +71,12 @@ public class Sistema extends Thread {
 		}while (reiniciarAnalise);
 
 		if (processosSemRodar.size() > 0){
-			System.out.println("DeadLock detectado entre os processos:");
+			principal.log("DeadLock detectado entre os processos:");
 			for (Integer integer : processosSemRodar) {
-				System.out.println(processos.get(integer).pid + " ");
+				principal.log(processos.get(integer).pid + " ");
 			}
 		}
+
 	}
 	
 	public void adicionarProcesso(Processo processo) {
@@ -87,7 +88,7 @@ public class Sistema extends Thread {
 	}
 	
 	public void statusSistema() {
-		System.out.println("O sistema verifica deadlock a cada "+ this.intervaloDeVerificacao +"s");
+//		System.out.println("O sistema verifica deadlock a cada "+ this.intervaloDeVerificacao +"s");
 	}
 	
 	public void checaDeadlock() {
@@ -129,7 +130,7 @@ public class Sistema extends Thread {
 			}
 
 			contador++;
-		}while(contador < 100 && aux < recursos.get(randomNum).maxInstancias);
+		}while(contador < 100 && aux == recursos.get(randomNum).maxInstancias);
 
 		if(contador == 100){
 			return -1;

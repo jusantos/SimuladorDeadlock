@@ -27,7 +27,7 @@ public class Principal extends JFrame {
 	public static JTable tableProcesso;
 	public static JTable tableRecurso;
 
-	public Sistema sistema = new Sistema(2);
+	public Sistema sistema;
 
 	private JPanel panelRecursosTotais, panelRecursosDisponiveis, panelRequisicoes;
 	private JScrollPane panelLog;
@@ -268,13 +268,14 @@ public class Principal extends JFrame {
 		this.panelLog.setEnabled(false);
 		panel.add(this.panelLog);
 
+		// Fazendo o SO começar a rodar
+		this.sistema = new Sistema(2, this);
+		this.sistema.start();
+
 		// Desenhando tabelas
 		this.desenharTabelaDeRecursosTotais();
 		this.desenharTabelaDeRecursosDisponiveis();
 		this.desenharTabelaDeRequisicoes();
-
-		// Fazendo o SO começar a rodar
-		this.sistema.start();
 
 	}
 

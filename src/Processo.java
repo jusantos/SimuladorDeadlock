@@ -52,7 +52,6 @@ public class Processo extends Thread {
 
 					this.requisicaoCorrente = indice;
 					Recurso recurso = this.sistema.recursos.get(this.requisicaoCorrente);
-					this.indexes.add(this.requisicaoCorrente);
 
 					this.sistema.upMutex();
 
@@ -73,6 +72,7 @@ public class Processo extends Thread {
 					principal.log("Processo " + this.pid + " pegou o recurso " + recurso.nome);
 					this.sistema.upMutex();
 
+					this.indexes.add(this.requisicaoCorrente);
 					this.recursosAlocados.add(recurso);
 					this.temposCorrentes.add(this.tempoDeUtilizacao + 1);
 

@@ -5,7 +5,7 @@ public class Recurso {
 	public String nome;
 	public int maxInstancias;
 	public int instancias;
-	public static Semaphore disponiveis = new Semaphore(0);
+	public Semaphore disponiveis;
 	public static int contRecursos = 0;
 	
 	public Recurso(String nome, int instancias) {
