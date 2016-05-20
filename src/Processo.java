@@ -16,6 +16,7 @@ public class Processo extends Thread {
 	private ArrayList<Recurso> recursosAlocados = new ArrayList<Recurso>();
 	public int[] numeroDeInstancias;
 
+
 	public Processo(int pid, int tempoDeSolicitacao, int tempoDeUtilizacao, Sistema sistema){
 		this.pid = pid;
 		this.tempoDeSolicitacao = tempoDeSolicitacao;

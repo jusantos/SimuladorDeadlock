@@ -1,3 +1,5 @@
+import com.sun.org.apache.xalan.internal.xslt.Process;
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
@@ -39,6 +41,44 @@ public class Sistema extends Thread {
 				
 			} catch (InterruptedException e){
 				e.printStackTrace();
+			}
+		}
+	}
+
+	public void detectarDeadLock(){
+		ArrayList<Integer> recursosDisponiveis = new ArrayList<>(recursos.size());
+		ArrayList<Integer> recursosRequisitados = new ArrayList<>(processos.size());
+		ArrayList<Integer> processosSemRodar     = new ArrayList<>(processos.size());
+
+		for (Recurso recurso : recursos) {
+			recursosDisponiveis.add(recurso.instancias);
+		}
+
+		for (int i = 0; i < processos.size(); i++) {
+			recursosRequisitados.add(processos.get(i).requisicaoCorrente);
+			processosSemRodar.add(i);
+		}
+
+		boolean reiniciarAnalise;
+		do{
+			reiniciarAnalise = false;
+			for (int i = 0; i < recursosRequisitados.size(); i++) {
+				if (processosSemRodar.contains(i)){
+					if (recursosDisponiveis.get(recursosRequisitados.get(i)) != 0){
+						processosSemRodar.remove(Integer.valueOf(i));
+						reiniciarAnalise = true;
+						for (int i1 = 0; i1 < processos.get(i).numeroDeInstancias.length; i1++) {
+							recursosDisponiveis.set(i,recursosDisponiveis.get(i) + processos.get(i).numeroDeInstancias[i]);
+						}
+					}
+				}
+			}
+		}while (reiniciarAnalise);
+
+		if (processosSemRodar.size() < processos.size()){
+			System.out.println("DeadLock detectado entre os processos:");
+			for (Integer integer : processosSemRodar) {
+				System.out.println(processos.get(integer).pid + " ");
 			}
 		}
 	}
