@@ -3,13 +3,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class Principal extends JFrame {
@@ -36,6 +30,8 @@ public class Principal extends JFrame {
 	public Sistema sistema = new Sistema(2);
 
 	private JPanel panelRecursosTotais, panelRecursosDisponiveis, panelRequisicoes;
+	private JScrollPane panelLog;
+	private JTextArea areaLog;
 
 	/**
 	 * Launch the application.
@@ -241,7 +237,6 @@ public class Principal extends JFrame {
 
 		this.panelRecursosTotais = new JPanel();
 		this.panelRecursosTotais.setBounds(10, 250, 500, 30);
-		this.panelRecursosTotais.setBackground(Color.RED);
 		this.panelRecursosTotais.setLayout(new BorderLayout());
 		panel.add(this.panelRecursosTotais);
 
@@ -251,7 +246,6 @@ public class Principal extends JFrame {
 
 		this.panelRecursosDisponiveis = new JPanel();
 		this.panelRecursosDisponiveis.setBounds(10, 310, 500, 30);
-		this.panelRecursosDisponiveis.setBackground(Color.BLUE);
 		this.panelRecursosDisponiveis.setLayout(new BorderLayout());
 		panel.add(this.panelRecursosDisponiveis);
 
@@ -261,9 +255,18 @@ public class Principal extends JFrame {
 
 		this.panelRequisicoes = new JPanel();
 		this.panelRequisicoes.setBounds(10, 375, 500, 30);
-		this.panelRequisicoes.setBackground(Color.PINK);
 		this.panelRequisicoes.setLayout(new BorderLayout());
 		panel.add(this.panelRequisicoes);
+
+		JLabel labelL = new JLabel("Logs");
+		labelL.setBounds(10, 415, 500, 20);
+		panel.add(labelL);
+
+		this.areaLog = new JTextArea();
+		this.panelLog = new JScrollPane(this.areaLog);
+		this.panelLog.setBounds(10, 435, 500, 80);
+		this.panelLog.setEnabled(false);
+		panel.add(this.panelLog);
 
 		// Desenhando tabelas
 		this.desenharTabelaDeRecursosTotais();
@@ -316,6 +319,10 @@ public class Principal extends JFrame {
 		this.panelRequisicoes.add(table.getTableHeader(), BorderLayout.PAGE_START);
 		this.panelRequisicoes.add(table, BorderLayout.CENTER);
 		this.panelRequisicoes.revalidate();
+	}
+
+	public void log(String message) {
+		this.areaLog.append(message + "\n");
 	}
 
 }

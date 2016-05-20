@@ -25,6 +25,7 @@ public class Processo extends Thread {
 	}
 	
 	public void run(){
+
 		int contadorSolicitacao = this.tempoDeSolicitacao;
 
 		while(this.keepAlive) {
@@ -48,12 +49,12 @@ public class Processo extends Thread {
 				Recurso recurso = this.sistema.recursos.get(this.requisicaoCorrente);
 
 				// Pegando o recurso a partir do semáforo
-				System.out.println("Processo " + this.pid + " solicitou o recurso " + recurso.nome);
+				principal.log("Processo " + this.pid + " solicitou o recurso " + recurso.nome);
 				principal.desenharTabelaDeRequisicoes();
 
 				this.sistema.downMutex();
 				if(recurso.instancias == 0) {
-					System.out.println("Processo " + this.pid + " bloqueou pelo recurso " + recurso.nome);
+					principal.log("Processo " + this.pid + " bloqueou pelo recurso " + recurso.nome);
 				}
 				this.sistema.upMutex();
 
@@ -63,7 +64,7 @@ public class Processo extends Thread {
 				this.sistema.downMutex();
 				recurso.instancias--;
 				numeroDeInstancias[this.requisicaoCorrente]++;
-				System.out.println("Processo " + this.pid + " pegou o recurso " + recurso.nome);
+				principal.log("Processo " + this.pid + " pegou o recurso " + recurso.nome);
 				this.sistema.upMutex();
 
 				this.recursosAlocados.add(recurso);
@@ -94,7 +95,7 @@ public class Processo extends Thread {
 
 		}
 
-		System.out.println("Processo " + this.pid + " finalizou");
+		principal.log("Processo " + this.pid + " finalizou");
 
 	}
 
