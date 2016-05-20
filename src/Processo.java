@@ -8,9 +8,10 @@ public class Processo extends Thread {
 	public boolean keepAlive = true;
 	private Sistema sistema;
 
-	private int requisicaoCorrente = -1;
+	public int requisicaoCorrente = -1;
 	private ArrayList<Integer> temposCorrentes = new ArrayList<Integer>();
 	private ArrayList<Recurso> recursosAlocados = new ArrayList<Recurso>();
+	public Principal principal;
 
 	public Processo(int pid, int tempoDeSolicitacao, int tempoDeUtilizacao, Sistema sistema){
 		this.pid = pid;
@@ -44,6 +45,7 @@ public class Processo extends Thread {
 
 				// Pegando o recurso a partir do semáforo
 				System.out.println("Processo " + this.pid + " solicitou o recurso " + recurso.nome);
+				principal.desenharTabelaDeRequisicoes();
 
 				this.sistema.downMutex();
 				if(recurso.instancias == 0) {
@@ -55,14 +57,18 @@ public class Processo extends Thread {
 				recurso.pegarInstancia();
 
 				this.sistema.downMutex();
-				recurso.instancias++;
+				recurso.instancias--;
 				System.out.println("Processo " + this.pid + " pegou o recurso " + recurso.nome);
 				this.sistema.upMutex();
 
 				this.recursosAlocados.add(recurso);
 				this.temposCorrentes.add(this.tempoDeUtilizacao + 1);
 
+				this.requisicaoCorrente = -1;
 				contadorSolicitacao = this.tempoDeSolicitacao;
+
+				this.principal.desenharTabelaDeRecursosDisponiveis();
+				principal.desenharTabelaDeRequisicoes();
 
 			}
 

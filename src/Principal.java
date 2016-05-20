@@ -1,23 +1,16 @@
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
-import java.util.concurrent.Semaphore;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 public class Principal extends JFrame {
 
@@ -41,6 +34,8 @@ public class Principal extends JFrame {
 	public static JTable tableRecurso;
 
 	public Sistema sistema = new Sistema(2);
+
+	private JPanel panelRecursosTotais, panelRecursosDisponiveis, panelRequisicoes;
 
 	/**
 	 * Launch the application.
@@ -160,6 +155,8 @@ public class Principal extends JFrame {
 					sistema.adicionarRecurso(recurso);
 					sistema.upMutex();
 					System.out.println("Novo recurso criado: " + recurso.nome + ", com " + recurso.instancias + " instâncias");
+					desenharTabelaDeRecursosTotais();
+					desenharTabelaDeRecursosDisponiveis();
 				} catch(Exception e1) {
 					JOptionPane.showMessageDialog(null, "Valor(es) inválido(s)!");
 				}
@@ -177,10 +174,13 @@ public class Principal extends JFrame {
 					int tempoSolicitacao = Integer.parseInt(tfTempoSolicitacaoProcesso.getText());
 					int tempoUtilizacao = Integer.parseInt(tfTempoUtilizacaoProcesso.getText());
 					Processo processo = new Processo(pid, tempoSolicitacao, tempoUtilizacao, sistema);
+					processo.principal = Principal.this;
 
 					sistema.downMutex();
 					sistema.adicionarProcesso(processo);
 					sistema.upMutex();
+
+					desenharTabelaDeRequisicoes();
 
 					processo.start();
 
@@ -234,82 +234,88 @@ public class Principal extends JFrame {
 		panel.add(STATUS);
 		STATUS.setColumns(15);
 
-		JLabel lblRecursos = new JLabel("RECURSOS");
-		lblRecursos.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblRecursos.setBounds(84, 235, 98, 14);
-		panel.add(lblRecursos);
+		// Array E
+		JLabel labelE = new JLabel("Recursos Totais");
+		labelE.setBounds(10, 230, 500, 15);
+		panel.add(labelE);
 
+		this.panelRecursosTotais = new JPanel();
+		this.panelRecursosTotais.setBounds(10, 250, 500, 30);
+		this.panelRecursosTotais.setBackground(Color.RED);
+		this.panelRecursosTotais.setLayout(new BorderLayout());
+		panel.add(this.panelRecursosTotais);
 
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 260, 234, 188);
-		panel.add(scrollPane);
+		JLabel labelA = new JLabel("Recursos Disponíveis");
+		labelA.setBounds(10, 295, 500, 15);
+		panel.add(labelA);
 
-		tableRecurso = new JTable();
-		scrollPane.setViewportView(tableRecurso);
-		tableRecurso.setToolTipText("");
-		tableRecurso.setFont(new Font("Tahoma", Font.BOLD, 11));
-		tableRecurso.setBackground(Color.WHITE);
-		tableRecurso.setModel(new DefaultTableModel(
-				new Object[][] {
-					{null, null, null},
-					{null, null, null},
-					{null, null, null},
-					{null, null, null},
-					{null, null, null},
-					{null, null, null},
-					{null, null, null},
-					{null, null, null},
-					{null, null, null},
-					{null, null, null},
-				},
-				new String[] {
-						"NOME", "E=[ ]", "A=[ ]"
-				}
-				));
-		tableRecurso.getColumnModel().getColumn(0).setPreferredWidth(78);
-		tableRecurso.getColumnModel().getColumn(0).setMinWidth(18);
-		tableRecurso.setBorder(new LineBorder(new Color(0, 0, 0), 0));
-		scrollPane.setViewportView(tableRecurso);
+		this.panelRecursosDisponiveis = new JPanel();
+		this.panelRecursosDisponiveis.setBounds(10, 310, 500, 30);
+		this.panelRecursosDisponiveis.setBackground(Color.BLUE);
+		this.panelRecursosDisponiveis.setLayout(new BorderLayout());
+		panel.add(this.panelRecursosDisponiveis);
 
+		JLabel labelR = new JLabel("Requisições");
+		labelR.setBounds(10, 355, 500, 15);
+		panel.add(labelR);
 
-		JScrollPane scrollPaneP = new JScrollPane();
-		scrollPaneP.setBounds(250, 260, 234, 188);
-		panel.add(scrollPaneP);
+		this.panelRequisicoes = new JPanel();
+		this.panelRequisicoes.setBounds(10, 375, 500, 30);
+		this.panelRequisicoes.setBackground(Color.PINK);
+		this.panelRequisicoes.setLayout(new BorderLayout());
+		panel.add(this.panelRequisicoes);
 
-		tableProcesso = new JTable();
-		scrollPaneP.setViewportView(tableProcesso);
-		tableProcesso.setToolTipText("");
-		tableProcesso.setFont(new Font("Tahoma", Font.BOLD, 11));
-		tableProcesso.setBackground(Color.WHITE);
-		tableProcesso.setModel(new DefaultTableModel(
-				new Object[][] {
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-				},
-				new String[] {
-						"PROCESSO", "STATUS"
-				}
-				));
-		tableProcesso.getColumnModel().getColumn(0).setPreferredWidth(78);
-		tableProcesso.getColumnModel().getColumn(0).setMinWidth(18);
-		tableProcesso.setBorder(new LineBorder(new Color(0, 0, 0), 0));
-		scrollPaneP.setViewportView(tableProcesso);
+		// Desenhando tabelas
+		this.desenharTabelaDeRecursosTotais();
+		this.desenharTabelaDeRecursosDisponiveis();
+		this.desenharTabelaDeRequisicoes();
 
 		// Fazendo o SO começar a rodar
 		this.sistema.start();
 
 	}
+
+	public void desenharTabelaDeRecursosTotais() {
+		String[] columnNames = new String[this.sistema.recursos.size()];
+		Object[][] columnData = new Object[1][this.sistema.recursos.size()];
+		for(int i = 0; i < this.sistema.recursos.size(); i++) {
+			columnNames[i] = this.sistema.recursos.get(i).nome;
+			columnData[0][i] = this.sistema.recursos.get(i).maxInstancias;
+		}
+		this.panelRecursosTotais.removeAll();
+		JTable table = new JTable(columnData, columnNames);
+		this.panelRecursosTotais.add(table.getTableHeader(), BorderLayout.PAGE_START);
+		this.panelRecursosTotais.add(table, BorderLayout.CENTER);
+		this.panelRecursosTotais.revalidate();
+	}
+
+	public void desenharTabelaDeRecursosDisponiveis() {
+		String[] columnNames = new String[this.sistema.recursos.size()];
+		Object[][] columnData = new Object[1][this.sistema.recursos.size()];
+		for(int i = 0; i < this.sistema.recursos.size(); i++) {
+			columnNames[i] = this.sistema.recursos.get(i).nome;
+			columnData[0][i] = this.sistema.recursos.get(i).instancias;
+		}
+		this.panelRecursosDisponiveis.removeAll();
+		JTable table = new JTable(columnData, columnNames);
+		this.panelRecursosDisponiveis.add(table.getTableHeader(), BorderLayout.PAGE_START);
+		this.panelRecursosDisponiveis.add(table, BorderLayout.CENTER);
+		this.panelRecursosDisponiveis.revalidate();
+	}
+
+	public void desenharTabelaDeRequisicoes() {
+		String[] columnNames = new String[this.sistema.processos.size()];
+		Object[][] columnData = new Object[1][this.sistema.processos.size()];
+		for(int i = 0; i < this.sistema.processos.size(); i++) {
+			columnNames[i] = "P" + this.sistema.processos.get(i).pid;
+			String r = this.sistema.processos.get(i).requisicaoCorrente >= 0 ? ("" + this.sistema.processos.get(i).requisicaoCorrente) : "-";
+			columnData[0][i] = r;
+		}
+		this.panelRequisicoes.removeAll();
+		JTable table = new JTable(columnData, columnNames);
+		this.panelRequisicoes.add(table.getTableHeader(), BorderLayout.PAGE_START);
+		this.panelRequisicoes.add(table, BorderLayout.CENTER);
+		this.panelRequisicoes.revalidate();
+	}
+
 }
