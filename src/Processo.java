@@ -13,7 +13,9 @@ public class Processo extends Thread {
 	public int requisicaoCorrente = -1;
 
 	private ArrayList<Integer> temposCorrentes = new ArrayList<Integer>();
+	private ArrayList<Integer> indexes = new ArrayList<Integer>();
 	private ArrayList<Recurso> recursosAlocados = new ArrayList<Recurso>();
+
 	public int[] numeroDeInstancias;
 
 
@@ -46,6 +48,7 @@ public class Processo extends Thread {
 				this.sistema.downMutex();
 				this.requisicaoCorrente = this.sistema.getIndiceDeRecurso(); // TODO Pegar um recurso aleatório de forma 'correta'
 				Recurso recurso = this.sistema.recursos.get(this.requisicaoCorrente);
+				this.indexes.add(this.requisicaoCorrente);
 				this.sistema.upMutex();
 
 				// Pegando o recurso a partir do semáforo
@@ -80,15 +83,16 @@ public class Processo extends Thread {
 			this.decrementaTempoDasInstancias();
 
 			// Liberando recursos
-			if(this.temposCorrentes.get(0) == 0) {
+			if(this.temposCorrentes.size() > 0 && this.temposCorrentes.get(0) == 0) {
 				Recurso recurso = this.recursosAlocados.get(0);
 				this.sistema.downMutex();
-//				this.numeroDeInstancias-- TODO Decrementar o número de instancias de um recurso para este processo
+				this.numeroDeInstancias[this.indexes.get(0)]--;
 				recurso.instancias++;
 				recurso.liberarInstancia();
 				this.sistema.upMutex();
 				this.recursosAlocados.remove(0);
 				this.temposCorrentes.remove(0);
+				this.indexes.remove(0);
 			}
 
 		}
