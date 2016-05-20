@@ -20,5 +20,9 @@ public class Recurso {
 		} catch (InterruptedException e) {
 		}
 	}
+
+	public void liberarInstancia() {
+		this.semaphoreIntances.release();
+	}
 	
 }
