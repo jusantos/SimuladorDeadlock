@@ -1,6 +1,9 @@
-
+import java.util.ArrayList;
 
 public class Sistema extends Thread {
+	
+	public ArrayList<Processo> processos = new ArrayList<Processo>();
+	public ArrayList<Recurso> recursos = new ArrayList<Recurso>();
 	
 	public int intervaloDeVerificacao;
 	public int tempo;
@@ -8,9 +11,8 @@ public class Sistema extends Thread {
 	public static boolean ActiveProcesso = true;
 	
 
-	Sistema(int intervalo){
+	public Sistema(int intervalo){
 		this.intervaloDeVerificacao = intervalo;
-		statusSistema();
 	}
 	
 	
@@ -18,23 +20,32 @@ public class Sistema extends Thread {
 		ActiveProcesso = true;
 		while(true){
 			try{
-				Thread.sleep(1000);
-				tempo++;
-				if(getTempo() % intervaloDeVerificacao == 0){
-					if(Processo.numeroDeProcessos == 1){
-						Principal.STATUS.setText("SISTEMA NORMAL");
-					}else if(Processo.numeroDeProcessos!=1 && Processo.recursoAtual == true){
-						Principal.STATUS.setText("DEADLOCK");
-					}else{
-						Principal.STATUS.setText("SISTEMA NORMAL");
-					}
-				}
+				Thread.sleep(this.intervaloDeVerificacao * 1000);
+				System.out.println("Sistema verificando a cada " + this.intervaloDeVerificacao + " segundos");
+//				tempo++;
+//				if(getTempo() % intervaloDeVerificacao == 0){
+//					if(Processo.numeroDeProcessos == 1){
+//						Principal.STATUS.setText("SISTEMA NORMAL");
+//					}else if(Processo.numeroDeProcessos!=1 && Processo.recursoAtual == true){
+//						Principal.STATUS.setText("DEADLOCK");
+//					}else{
+//						Principal.STATUS.setText("SISTEMA NORMAL");
+//					}
+//				}
 					
 				
 			} catch (InterruptedException e){
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void adicionarProcesso(Processo processo) {
+		this.processos.add(processo);
+	}
+	
+	public void adicionarRecurso(Recurso recurso) {
+		this.recursos.add(recurso);
 	}
 	
 	public void statusSistema() {
@@ -51,5 +62,9 @@ public class Sistema extends Thread {
 	
 	public static String getStatus(){
 		return status;
+	}
+	
+	public void setIntervaloDeVerificacao(int intervalo) {
+		this.intervaloDeVerificacao = intervalo;
 	}
 }
