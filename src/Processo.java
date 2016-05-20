@@ -13,12 +13,17 @@ public class Processo extends Thread {
 	public int requisicaoCorrente = -1;
 
 	private ArrayList<Integer> temposCorrentes = new ArrayList<Integer>();
+	private ArrayList<Integer> indexes = new ArrayList<Integer>();
 	private ArrayList<Recurso> recursosAlocados = new ArrayList<Recurso>();
+
 	public int[] numeroDeInstancias;
 
+<<<<<<< HEAD
 	public ArrayList<Recurso> getRecursosAlocados() {
 		return recursosAlocados;
 	}
+=======
+>>>>>>> 6b29a01f1d7786980b1638ac936ff7c8b7ef95ab
 
 	public Processo(int pid, int tempoDeSolicitacao, int tempoDeUtilizacao, Sistema sistema){
 		this.pid = pid;
@@ -55,16 +60,16 @@ public class Processo extends Thread {
 				this.sistema.upMutex();
 
 				Recurso recurso = this.sistema.recursos.get(this.requisicaoCorrente);
+				this.indexes.add(this.requisicaoCorrente);
+				this.sistema.upMutex();
 
 				// Pegando o recurso a partir do semáforo
 				principal.log("Processo " + this.pid + " solicitou o recurso " + recurso.nome);
 				principal.desenharTabelaDeRequisicoes();
 
-				this.sistema.downMutex();
 				if(recurso.instancias == 0) {
 					principal.log("Processo " + this.pid + " bloqueou pelo recurso " + recurso.nome);
 				}
-				this.sistema.upMutex();
 
 				// Dorme se não houver nenhuma instância disponível
 				recurso.pegarInstancia();
@@ -90,15 +95,16 @@ public class Processo extends Thread {
 			this.decrementaTempoDasInstancias();
 
 			// Liberando recursos
-			int index = -1;
-			while((index = this.indexDoPrimeiroRecursoALiberar()) >= 0) {
-				Recurso recurso = this.recursosAlocados.get(index);
+			if(this.temposCorrentes.size() > 0 && this.temposCorrentes.get(0) == 0) {
+				Recurso recurso = this.recursosAlocados.get(0);
 				this.sistema.downMutex();
+				this.numeroDeInstancias[this.indexes.get(0)]--;
 				recurso.instancias++;
 				recurso.liberarInstancia();
 				this.sistema.upMutex();
-				this.recursosAlocados.remove(index);
-				this.temposCorrentes.remove(index);
+				this.recursosAlocados.remove(0);
+				this.temposCorrentes.remove(0);
+				this.indexes.remove(0);
 			}
 
 		}
@@ -111,15 +117,6 @@ public class Processo extends Thread {
 		for(int i = 0; i < this.temposCorrentes.size(); i++) {
 			this.temposCorrentes.set(i, this.temposCorrentes.get(i) - 1);
 		}
-	}
-
-	private int indexDoPrimeiroRecursoALiberar() {
-		for(int i = 0; i < this.temposCorrentes.size(); i++) {
-			if(this.temposCorrentes.get(i) == 0) {
-				return i;
-			}
-		}
-		return -1;
 	}
 	
 }
