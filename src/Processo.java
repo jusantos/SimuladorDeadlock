@@ -18,13 +18,6 @@ public class Processo extends Thread {
 
 	public int[] numeroDeInstancias;
 
-<<<<<<< HEAD
-	public ArrayList<Recurso> getRecursosAlocados() {
-		return recursosAlocados;
-	}
-=======
->>>>>>> 6b29a01f1d7786980b1638ac936ff7c8b7ef95ab
-
 	public Processo(int pid, int tempoDeSolicitacao, int tempoDeUtilizacao, Sistema sistema){
 		this.pid = pid;
 		this.tempoDeSolicitacao = tempoDeSolicitacao;
@@ -54,40 +47,44 @@ public class Processo extends Thread {
 				// Pegando o índice de um recurso aleatório
 				this.sistema.downMutex();
 				int indice = this.sistema.getIndiceDeRecurso(pid);
+
 				if(indice != -1) {
+
 					this.requisicaoCorrente = indice;
+					Recurso recurso = this.sistema.recursos.get(this.requisicaoCorrente);
+					this.indexes.add(this.requisicaoCorrente);
+
+					this.sistema.upMutex();
+
+					// Pegando o recurso a partir do semáforo
+					principal.log("Processo " + this.pid + " solicitou o recurso " + recurso.nome);
+					principal.desenharTabelaDeRequisicoes();
+
+					if(recurso.instancias == 0) {
+						principal.log("Processo " + this.pid + " bloqueou pelo recurso " + recurso.nome);
+					}
+
+					// Dorme se não houver nenhuma instância disponível
+					recurso.pegarInstancia();
+
+					this.sistema.downMutex();
+					recurso.instancias--;
+					numeroDeInstancias[this.requisicaoCorrente]++;
+					principal.log("Processo " + this.pid + " pegou o recurso " + recurso.nome);
+					this.sistema.upMutex();
+
+					this.recursosAlocados.add(recurso);
+					this.temposCorrentes.add(this.tempoDeUtilizacao + 1);
+
+					this.requisicaoCorrente = -1;
+					contadorSolicitacao = this.tempoDeSolicitacao;
+
+					this.principal.desenharTabelaDeRecursosDisponiveis();
+					principal.desenharTabelaDeRequisicoes();
+
+				} else {
+					this.sistema.upMutex();
 				}
-				this.sistema.upMutex();
-
-				Recurso recurso = this.sistema.recursos.get(this.requisicaoCorrente);
-				this.indexes.add(this.requisicaoCorrente);
-				this.sistema.upMutex();
-
-				// Pegando o recurso a partir do semáforo
-				principal.log("Processo " + this.pid + " solicitou o recurso " + recurso.nome);
-				principal.desenharTabelaDeRequisicoes();
-
-				if(recurso.instancias == 0) {
-					principal.log("Processo " + this.pid + " bloqueou pelo recurso " + recurso.nome);
-				}
-
-				// Dorme se não houver nenhuma instância disponível
-				recurso.pegarInstancia();
-
-				this.sistema.downMutex();
-				recurso.instancias--;
-				numeroDeInstancias[this.requisicaoCorrente]++;
-				principal.log("Processo " + this.pid + " pegou o recurso " + recurso.nome);
-				this.sistema.upMutex();
-
-				this.recursosAlocados.add(recurso);
-				this.temposCorrentes.add(this.tempoDeUtilizacao + 1);
-
-				this.requisicaoCorrente = -1;
-				contadorSolicitacao = this.tempoDeSolicitacao;
-
-				this.principal.desenharTabelaDeRecursosDisponiveis();
-				principal.desenharTabelaDeRequisicoes();
 
 			}
 
@@ -117,6 +114,10 @@ public class Processo extends Thread {
 		for(int i = 0; i < this.temposCorrentes.size(); i++) {
 			this.temposCorrentes.set(i, this.temposCorrentes.get(i) - 1);
 		}
+	}
+
+	public ArrayList<Recurso> getRecursosAlocados() {
+		return recursosAlocados;
 	}
 	
 }
