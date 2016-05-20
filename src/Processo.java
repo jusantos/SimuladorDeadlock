@@ -6,18 +6,22 @@ public class Processo extends Thread {
 	public int tempoDeSolicitacao;
 	public int tempoDeUtilizacao;
 	public boolean keepAlive = true;
+
 	private Sistema sistema;
+	public Principal principal;
 
 	public int requisicaoCorrente = -1;
+
 	private ArrayList<Integer> temposCorrentes = new ArrayList<Integer>();
 	private ArrayList<Recurso> recursosAlocados = new ArrayList<Recurso>();
-	public Principal principal;
+	public int[] numeroDeInstancias;
 
 	public Processo(int pid, int tempoDeSolicitacao, int tempoDeUtilizacao, Sistema sistema){
 		this.pid = pid;
 		this.tempoDeSolicitacao = tempoDeSolicitacao;
 		this.tempoDeUtilizacao = tempoDeUtilizacao;
 		this.sistema = sistema;
+		this.numeroDeInstancias = new int[sistema.recursos.size()];
 	}
 	
 	public void run(){
@@ -58,6 +62,7 @@ public class Processo extends Thread {
 
 				this.sistema.downMutex();
 				recurso.instancias--;
+				numeroDeInstancias[this.requisicaoCorrente]++;
 				System.out.println("Processo " + this.pid + " pegou o recurso " + recurso.nome);
 				this.sistema.upMutex();
 
